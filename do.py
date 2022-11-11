@@ -12,6 +12,9 @@ class DO():
         self.total_vm = self.get_request()['meta']['total']
 
     def get_request(self):
+        '''
+        Get information from DigitalOcean about all droplets
+        '''
         key = self.config['api_key']['key']
         url = 'https://api.digitalocean.com/v2/droplets'
         headers = {
@@ -23,6 +26,9 @@ class DO():
         return response.json()
 
     def get_ips(self):
+        '''
+        Filter out IP address information from all informaiton.
+        '''
         ips = []
         for i in self.droplets:
             networks = i['networks']['v4']
