@@ -3,31 +3,34 @@ import requests
 import configparser
 
 
-main_dir = pathlib.Path(__file__).parent.resolve()
-config = configparser.ConfigParser()
-config.read(f'{main_dir}/api_key.ini')
-key = config['api_key']['key']
+class DO():
+    def __init__(self):
+        self.mypath = pathlib.Path(__file__).parent.resolve()
+        self.config = configparser.ConfigParser()
+        self.config.read(f'{self.mypath}/api_key.ini')  
+        self.droplets = self.get_request()['droplets']
+        self.total_vm = self.get_request()['meta']['total']
 
-def get_request(url):
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {key}"
-    }
+    def get_request(self):
+        key = self.config['api_key']['key']
+        url = 'https://api.digitalocean.com/v2/droplets'
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {key}'
+        }
 
-    response = requests.get(url, headers=headers)
-    return response.json()
+        response = requests.get(url, headers=headers)
+        return response.json()
 
-def process_ips(ips_dict):
-    ips = []
-    for i in ips_dict['droplets']:
-        networks = i['networks']['v4']
-        ips.extend([net['ip_address'] for net in networks
-                        if net['type'] == 'public'])
-    return ips
+    def get_ips(self):
+        ips = []
+        for i in self.droplets:
+            networks = i['networks']['v4']
+            ips.extend([net['ip_address'] for net in networks
+                            if net['type'] == 'public'])
+        return ips
 
 
 if __name__ == '__main__':
-    url_resips = "https://api.digitalocean.com/v2/droplets"
-    ips = process_ips(get_request(url_resips))
-    for ip in ips:
-        print(ip)
+    do = DO()
+    print(do.get_ips())
