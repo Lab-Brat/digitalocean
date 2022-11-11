@@ -1,10 +1,12 @@
 import pathlib
 import requests
+import configparser
 
 
 main_dir = pathlib.Path(__file__).parent.resolve()
-with open(f'{main_dir}/api_key', 'r') as file:
-    key = file.readlines()[0].replace('\n', '')
+config = configparser.ConfigParser()
+config.read(f'{main_dir}/api_key.ini')
+key = config['api_key']['key']
 
 def get_request(url):
     headers = {
